@@ -1,0 +1,126 @@
+﻿<Window x:Class="WpfApp1.Pages.AddEditDeviceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1.Pages"
+        xmlns:viewModels="clr-namespace:WpfApp1.ViewModels"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:converters="clr-namespace:WpfApp1.Converters"
+        mc:Ignorable="d"
+        Title="{Binding Title}" Height="Auto" Width="500" SizeToContent="Height"
+        WindowStartupLocation="CenterScreen"
+        d:DataContext="{d:DesignInstance Type=viewModels:AddEditDeviceViewModel, IsDesignTimeCreatable=True}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        Foreground="{DynamicResource MaterialDesignBody}"
+        FontSize="14">
+    <Window.Resources>
+        <ResourceDictionary>
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Padding="16">
+            <StackPanel>
+                <TextBox materialDesign:HintAssist.Hint="Name"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                         Margin="0,8"/>
+
+                <TextBox materialDesign:HintAssist.Hint="Inventory Number"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Text="{Binding InventoryNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                         Margin="0,8"/>
+
+                <ComboBox materialDesign:HintAssist.Hint="Device Type"
+                          Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                          ItemsSource="{Binding AvailableDeviceTypes}"
+                          SelectedItem="{Binding SelectedDeviceType, ValidatesOnNotifyDataErrors=True}"
+                          DisplayMemberPath="TypeName"
+                          SelectedValuePath="TypeId" Margin="0,8"/>
+
+                <ComboBox materialDesign:HintAssist.Hint="Device Status"
+                          Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                          ItemsSource="{Binding AvailableDeviceStatuses}"
+                          SelectedItem="{Binding SelectedDeviceStatus}"
+                          DisplayMemberPath="StatusName"
+                          SelectedValuePath="StatusId" Margin="0,8"/>
+
+                <TextBox materialDesign:HintAssist.Hint="IP Address"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Text="{Binding IPAddress, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                         Margin="0,8"/>
+
+                <TextBox materialDesign:HintAssist.Hint="MAC Address"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Text="{Binding MACAddress, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                         Margin="0,8"/>
+
+                <TextBox materialDesign:HintAssist.Hint="Location"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Text="{Binding Location, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                         Margin="0,8"/>
+
+                <TextBox materialDesign:HintAssist.Hint="Department"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Text="{Binding Department, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                         Margin="0,8"/>
+
+                <ComboBox materialDesign:HintAssist.Hint="Responsible User"
+                          Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                          ItemsSource="{Binding AvailableUsers}"
+                          SelectedItem="{Binding SelectedResponsibleUser}"
+                          DisplayMemberPath="FullName"
+                          SelectedValuePath="UserId" Margin="0,8"/>
+
+                <TextBox materialDesign:HintAssist.Hint="Serial Number"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Text="{Binding SerialNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                         Margin="0,8"/>
+
+                <TextBox materialDesign:HintAssist.Hint="Operating System"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Text="{Binding OperatingSystem, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                         Margin="0,8"/>
+
+                <DatePicker materialDesign:HintAssist.Hint="Purchase Date"
+                            Style="{StaticResource MaterialDesignFloatingHintDatePicker}"
+                            SelectedDate="{Binding PurchaseDate, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                            Margin="0,8"/>
+
+                <TextBox materialDesign:HintAssist.Hint="Purchase Cost"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Text="{Binding PurchaseCost, UpdateSourceTrigger=PropertyChanged, StringFormat=C, ValidatesOnNotifyDataErrors=True}"
+                         Margin="0,8"/>
+                <DatePicker materialDesign:HintAssist.Hint="Warranty End Date"
+                            Style="{StaticResource MaterialDesignFloatingHintDatePicker}"
+                            SelectedDate="{Binding WarrantyEndDate, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                            Margin="0,8"/>
+
+                <DatePicker materialDesign:HintAssist.Hint="Last Seen"
+                            Style="{StaticResource MaterialDesignFloatingHintDatePicker}"
+                            SelectedDate="{Binding LastSeen, Mode=OneWay}" IsEnabled="False"
+                            Margin="0,8"/>
+                <TextBox materialDesign:HintAssist.Hint="Notes"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}" Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Auto" Margin="0,8,0,0" MinHeight="100" MaxHeight="200"
+                         materialDesign:HintAssist.IsFloating="True"/>
+            </StackPanel>
+        </ScrollViewer>
+        <Border Grid.Row="1" BorderThickness="0 1 0 0" BorderBrush="{DynamicResource MaterialDesignDivider}" Margin="0,10,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="16">
+                <Button Content="Save" Command="{Binding SaveDeviceCommand}"
+                        Style="{StaticResource MaterialDesignRaisedButton}"
+                        IsEnabled="{Binding HasErrors, Converter={StaticResource InverseBooleanConverter}}" Width="100" Margin="0,0,10,0"/>
+                <Button Content="Cancel" Command="{Binding CancelCommand}"
+                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Width="100" IsCancel="True" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

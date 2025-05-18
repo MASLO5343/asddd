@@ -1,0 +1,64 @@
+﻿<Page x:Class="WpfApp1.Pages.MonitoringPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+      mc:Ignorable="d"
+      Background="Black">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок -->
+        <TextBlock Text="Мониторинг" FontSize="24" Foreground="White" FontWeight="Bold" />
+
+        <!-- Серверы -->
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,10" HorizontalAlignment="Center">
+            <Border Background="#1a1a1a" BorderBrush="White" BorderThickness="1" CornerRadius="8" Padding="10" Margin="5">
+                <StackPanel>
+                    <TextBlock Text="Сервер 1" Foreground="White" FontWeight="Bold"/>
+                    <TextBlock Text="Статус: Онлайн" Foreground="Lime"/>
+                </StackPanel>
+            </Border>
+            <Border Background="#1a1a1a" BorderBrush="White" BorderThickness="1" CornerRadius="8" Padding="10" Margin="5">
+                <StackPanel>
+                    <TextBlock Text="Сервер 2" Foreground="White" FontWeight="Bold"/>
+                    <TextBlock Text="Статус: Нет связи" Foreground="Red"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <!-- График -->
+        <GroupBox Header="Загрузка CPU" Grid.Row="2" Foreground="White" BorderBrush="White" Margin="0,10">
+            <lvc:CartesianChart Series="{Binding CpuSeries}" 
+                                XAxes="{Binding XAxes}" 
+                                YAxes="{Binding YAxes}" 
+                                Background="Transparent"/>
+        </GroupBox>
+
+        <!-- События и кнопка -->
+        <Grid Grid.Row="3" Margin="0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <GroupBox Header="События" Foreground="White" BorderBrush="White" Width="500">
+                <ListBox Background="Black" Foreground="White" Height="100">
+                    <ListBoxItem>⚠ Сервер 2 не отвечает (12:43)</ListBoxItem>
+                    <ListBoxItem>✔ Сервер 1 стабилен (12:40)</ListBoxItem>
+                    <ListBoxItem>⚠ Повышенная нагрузка на сервер 2 (12:38)</ListBoxItem>
+                </ListBox>
+            </GroupBox>
+
+            <Button Grid.Column="1" Content="Обновить" Width="100" Margin="10,0,0,0" Click="Refresh_Click"/>
+        </Grid>
+    </Grid>
+</Page>
+
