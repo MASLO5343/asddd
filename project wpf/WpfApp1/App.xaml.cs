@@ -2,8 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Serilog.Core;
-using Serilog.Events;
+using Serilog.Core; // Для LoggingLevelSwitch
+using Serilog.Events; // Для LogEventLevel
 using System;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,96 +13,103 @@ using WpfApp1.Pages;
 using WpfApp1.Services;
 using WpfApp1.ViewModels;
 using WpfApp1.Windows;
-using Microsoft.Extensions.Configuration; // Убедитесь, что это есть
-using Microsoft.EntityFrameworkCore; // << ДОБАВЛЕНО для UseSqlServer
+using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
+using WpfApp1.Views.Dialogs;
 
 namespace WpfApp1
 {
     public partial class App : Application
     {
         public static IHost? AppHost { get; private set; }
-        private static LoggingLevelSwitch _loggingLevelSwitch = new LoggingLevelSwitch(LogEventLevel.Information);
+        private static LoggingLevelSwitch _loggingLevelSwitch = new LoggingLevelSwitch(LogEventLevel.Information); // Уровень по умолчанию
 
         public App()
         {
             AppHost = Host.CreateDefaultBuilder()
                 .ConfigureAppConfiguration((hostContext, config) =>
                 {
-                    // Конфигурация appsettings.json и UserSecrets
+                    // Конфигурация appsettings.json и UserSecrets уже обрабатывается CreateDefaultBuilder()
+                    // Можно добавить дополнительные источники конфигурации здесь, если нужно
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
+                    // Инициализация Serilog из конфигурации
                     Serilog.Log.Logger = new LoggerConfiguration()
-                        .ReadFrom.Configuration(hostContext.Configuration) // Читает конфигурацию Serilog из appsettings.json
-                        .MinimumLevel.ControlledBy(_loggingLevelSwitch)
+                        .ReadFrom.Configuration(hostContext.Configuration)
+                        .MinimumLevel.ControlledBy(_loggingLevelSwitch) // Управление уровнем логирования
                         .Enrich.FromLogContext()
-                        .Enrich.WithMachineName()
-                        .Enrich.WithThreadId()
-
-                        // .WriteTo.Console() // Можно оставить, если нужно дублирование в консоль
-                        // .WriteTo.File($"logs/wpfapp-{DateTime.Now:yyyyMMdd}.txt", // Настройки файла могут быть в appsettings.json
-                        //     rollingInterval: RollingInterval.Day,
-                        //     retainedFileCountLimit: 7,
-                        //     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] ({SourceContext}) {Message:lj}{NewLine}{Exception}")
-                        // .WriteTo.MSSqlServer( // Настройки MSSqlServer могут быть в appsettings.json
-                        //    connectionString: hostContext.Configuration.GetConnectionString("AppDbContext"), // Используем строку из конфигурации
-                        //    tableName: "Logs", // Имя таблицы как в конфигурации Serilog
-                        //    autoCreateSqlTable: true, // автосоздание таблицы
-                        //    columnOptionsSection: hostContext.Configuration.GetSection("Serilog:WriteTo:1:Args:columnOptions")) // путь к columnOptions
+                        // Дополнительные Enrichers можно добавить здесь или в appsettings.json
                         .CreateLogger();
 
                     services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
-                    services.AddSingleton(_loggingLevelSwitch);
-                    services.AddTransient<ISoftwareService, SoftwareService>();
-                    services.AddTransient<IDeviceSoftwareService, DeviceSoftwareService>();
-                    // Регистрация AppDbContext с использованием строки подключения из конфигурации
+                    services.AddSingleton(_loggingLevelSwitch); // Для динамического изменения уровня логирования
+
+                    // Регистрация AppDbContext
                     services.AddDbContext<AppDbContext>(options =>
-                        options.UseSqlServer(hostContext.Configuration.GetConnectionString("AppDbContext")),
-                        ServiceLifetime.Transient);
+                        options.UseSqlServer(hostContext.Configuration.GetConnectionString("DefaultConnection")), // ИСПРАВЛЕНО: Использовать "DefaultConnection"
+                        ServiceLifetime.Transient); // Используйте Transient или Scoped в зависимости от потребностей
 
-
+                    // Регистрация сервисов
                     services.AddSingleton<IApplicationStateService, ApplicationStateService>();
                     services.AddSingleton<IDialogService, DialogService>();
+
+                    // INavigationService теперь регистрируется через MainWindow, которое его реализует
+                    // services.AddSingleton<INavigationService, NavigationService>(); // Старая регистрация
                     services.AddSingleton<INavigationService>(provider => provider.GetRequiredService<MainWindow>());
+
+
                     services.AddSingleton<IPermissionService, PermissionService>();
 
-                    services.AddSingleton<IAuthService, AuthService>();
+                    // IPasswordHasher<User> будет разрешен по умолчанию, если установлен пакет Microsoft.AspNetCore.Identity.Core
+                    // services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>(); // Явная регистрация, если нужна специфическая конфигурация или если авто-разрешение не работает
+
+                    services.AddSingleton<IAuthService, AuthService>(); // AuthService теперь синглтон, если нет состояния, которое мешает этому
+                    services.AddTransient<IAdAuthService, AdAuthService>(); // Если AdAuthService не имеет состояния
                     services.AddTransient<IUserService, UserService>();
                     services.AddTransient<IRoleService, RoleService>();
                     services.AddTransient<IDeviceService, DeviceService>();
-                    services.AddTransient<ILogService, LogService>();
-                    services.AddTransient<ILoggingService, LoggingService>(); // Если это ваш сервис для логгирования бизнес-логики
-                    services.AddSingleton<IAuthService, AuthService>();
-
-                    services.AddSingleton<MainViewModel>();
-                    services.AddTransient<LoginViewModel>();
-                    services.AddTransient<UsersViewModel>();
-                    services.AddTransient<AddEditUserViewModel>();
-                    services.AddTransient<InventoryViewModel>();
-                    services.AddTransient<AddEditDeviceViewModel>();
-                    services.AddTransient<LogsViewModel>();
-                    services.AddTransient<TicketsViewModel>();
-
-                    services.AddSingleton<MainWindow>();
-                    services.AddTransient<LoginWindow>();
-                    services.AddTransient<AddEditUserWindow>();
-                    services.AddTransient<AddEditDeviceWindow>(); // Раскомментировано, если используется
-
-                    services.AddTransient<UsersPage>();
-                    services.AddTransient<InventoryPage>();
-                    services.AddTransient<LogsPage>();
-                    services.AddTransient<MonitoringPage>();
-                    services.AddTransient<DashboardViewModel>();
-                    services.AddTransient<MonitoringViewModel>();
-                    services.AddTransient<DashboardViewModel>();
-                    services.AddTransient<TicketsPage>();
-                    // services.AddTransient<ColumnSettingsPage>(); // Если используется
+                    services.AddTransient<ISoftwareService, SoftwareService>();
+                    services.AddTransient<IDeviceSoftwareService, DeviceSoftwareService>();
                     services.AddTransient<ITicketService, TicketService>();
                     services.AddTransient<ITicketCommentService, TicketCommentService>();
+                    services.AddTransient<ILogService, LogService>(); // Для чтения логов из БД
+                    services.AddTransient<ILoggingService, LoggingService>(); // Ваш собственный сервис-обертка для логгирования
                     services.AddTransient<IDataSeeder, DatabaseSeeder>();
+
+                    // Регистрация ViewModel'ов
+                    services.AddSingleton<MainViewModel>(); // MainViewModel часто делают Singleton
+                    services.AddTransient<LoginViewModel>();
+                    services.AddTransient<DashboardViewModel>();
+                    services.AddTransient<InventoryViewModel>();
+                    services.AddTransient<AddEditDeviceViewModel>();
+                    services.AddTransient<TicketsViewModel>();
+                    services.AddTransient<UsersViewModel>();
+                    services.AddTransient<AddEditUserViewModel>();
+                    services.AddTransient<LogsViewModel>();
+                    services.AddTransient<MonitoringViewModel>();
+                    services.AddTransient<ViewModels.Dialogs.AddEditTicketDialogViewModel>(); // Уточните пространство имен, если есть конфликт
+                    // services.AddTransient<ViewModels.Dialogs.AddSoftwareToDeviceDialogViewModel>(); // Если используется
+
+                    // Регистрация Окон
+                    services.AddSingleton<MainWindow>(); // MainWindow часто Singleton
+                    services.AddTransient<LoginWindow>();
+                    services.AddTransient<AddEditUserWindow>();
+                    services.AddTransient<AddEditDeviceWindow>();
+                    services.AddTransient<DialogWindowBase>(); // Базовое окно для диалогов
+
+                    // Регистрация Страниц
+                    services.AddTransient<DashboardPage>();
+                    services.AddTransient<InventoryPage>();
+                    services.AddTransient<TicketsPage>();
+                    services.AddTransient<UsersPage>();
+                    services.AddTransient<LogsPage>();
+                    services.AddTransient<MonitoringPage>();
+                    // services.AddTransient<ColumnSettingsPage>(); // Если используется
                 })
                 .Build();
 
+            // Глобальные обработчики исключений
             DispatcherUnhandledException += OnDispatcherUnhandledException;
             TaskScheduler.UnobservedTaskException += OnTaskSchedulerUnobservedTaskException;
             AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
@@ -112,38 +119,81 @@ namespace WpfApp1
         {
             await AppHost!.StartAsync();
 
+            // Сидинг данных и настройка уровня логирования
             using (var scope = AppHost.Services.CreateScope())
             {
                 var seeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
-                await seeder.SeedAsync();
+                await seeder.SeedAsync(); // Убедитесь, что SeedAsync корректно обрабатывает существующие данные
 
                 var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-                // Установка начального уровня логирования из конфигурации
-                var initialLogLevelString = config["Serilog:MinimumLevel:Default"]; // Путь к настройке
+                var initialLogLevelString = config["Serilog:MinimumLevel:Default"];
                 if (Enum.TryParse<LogEventLevel>(initialLogLevelString, out var initialLogLevel))
                 {
                     _loggingLevelSwitch.MinimumLevel = initialLogLevel;
+                    Serilog.Log.Information("Logging level set to {LogLevel} from configuration.", initialLogLevel);
                 }
                 else
                 {
-                    _loggingLevelSwitch.MinimumLevel = LogEventLevel.Information; // Уровень по умолчанию, если не указан или невалиден
+                    _loggingLevelSwitch.MinimumLevel = LogEventLevel.Information; // Уровень по умолчанию
+                    Serilog.Log.Warning("Could not parse initial log level from configuration. Defaulting to {LogLevel}.", _loggingLevelSwitch.MinimumLevel);
                 }
             }
 
-            var loginWindow = AppHost.Services.GetRequiredService<LoginWindow>();
             var appState = AppHost.Services.GetRequiredService<IApplicationStateService>();
 
-            loginWindow.ShowDialog();
+            // Запускаем цикл логина
+            bool loggedInSuccessfully = false;
+            while (true) // Цикл для повторного показа окна логина при неудаче или выходе
+            {
+                var loginViewModel = AppHost.Services.GetRequiredService<LoginViewModel>(); // Получаем новый экземпляр ViewModel
+                var loginWindow = AppHost.Services.GetRequiredService<LoginWindow>();
+                loginWindow.DataContext = loginViewModel; // ИСПРАВЛЕНО: Установка DataContext
 
-            if (appState.CurrentUser != null)
+                var dialogResult = loginWindow.ShowDialog();
+
+                if (dialogResult == true && appState.CurrentUser != null)
+                {
+                    loggedInSuccessfully = true;
+                    break; // Успешный вход, выходим из цикла
+                }
+                else
+                {
+                    // Если пользователь закрыл окно входа или аутентификация не удалась,
+                    // и мы не хотим сразу закрывать приложение, можно дать ему выйти или повторить.
+                    // В данном случае, если DialogResult не true, приложение закроется после цикла.
+                    // Можно добавить кнопку "Выход" на LoginWindow или обработать закрытие окна как выход.
+                    if (loginWindow.IsActive) // Если окно еще не закрыто (например, DialogResult был false)
+                    {
+                        // Пользователь мог нажать "Отмена" или что-то подобное, если такая логика есть в LoginViewModel
+                        // Если окно просто закрыто (крестиком), dialogResult будет null.
+                        // В этом случае, позволяем приложению завершиться.
+                    }
+                    break; // Выходим из цикла, если логин не удался или отменен
+                }
+            }
+
+
+            if (loggedInSuccessfully)
             {
                 var mainWindow = AppHost.Services.GetRequiredService<MainWindow>();
+                var mainViewModel = AppHost.Services.GetRequiredService<MainViewModel>();
+
+                // Передача сервисов в MainViewModel (если они не инжектируются через конструктор)
+                // Предпочтительно инжектировать через конструктор MainViewModel
+                mainViewModel.NavigationService = AppHost.Services.GetRequiredService<INavigationService>();
+                mainViewModel.PermissionService = AppHost.Services.GetRequiredService<IPermissionService>();
+                mainViewModel.ApplicationStateService = appState; // Уже есть ссылка
+                mainViewModel.DialogService = AppHost.Services.GetRequiredService<IDialogService>();
+                mainViewModel.ServiceProvider = AppHost.Services; // Передаем IServiceProvider
+
+                await mainViewModel.InitializeAsync(); // Инициализация MainViewModel
+
                 Current.MainWindow = mainWindow;
                 mainWindow.Show();
             }
             else
             {
-                Shutdown();
+                Shutdown(); // Завершаем приложение, если вход не выполнен
             }
 
             base.OnStartup(e);
@@ -151,19 +201,19 @@ namespace WpfApp1
 
         private void HandleException(Exception ex, string context)
         {
-            Serilog.Log.Error(ex, $"Global exception in {context}");
+            Serilog.Log.Fatal(ex, "Unhandled exception in {Context}", context); // Используем Fatal для серьезных ошибок
             try
             {
                 var dialogService = AppHost?.Services?.GetService<IDialogService>();
-                // Используем ShowError с тремя аргументами, как предполагается в вашем коде
                 dialogService?.ShowError("Критическая ошибка",
-                                         $"Произошла непредвиденная ошибка в {context}: {ex.Message}",
-                                         ex.ToString()); // ex.ToString() для деталей
+                                         $"Произошла непредвиденная ошибка в {context}. Приложение может работать нестабильно. Рекомендуется перезапуск.",
+                                         ex.ToString());
             }
             catch (Exception dialogEx)
             {
-                Serilog.Log.Error(dialogEx, "Failed to show error dialog.");
-                MessageBox.Show($"Произошла критическая ошибка, и не удалось отобразить диалоговое окно ошибки: {ex.Message}\nДетали: {ex.ToString()}",
+                Serilog.Log.Error(dialogEx, "Failed to show error dialog during global exception handling.");
+                MessageBox.Show($"Произошла критическая ошибка: {ex.Message}\nДетали: {ex.ToString()}" +
+                                $"\n\nТакже не удалось отобразить диалоговое окно ошибки: {dialogEx.Message}",
                                 "Критическая ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -171,31 +221,32 @@ namespace WpfApp1
         private void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             HandleException(e.Exception, "DispatcherUnhandledException");
-            e.Handled = true; // Помечаем ошибку как обработанную, чтобы приложение не падало
+            e.Handled = true; // Помечаем ошибку как обработанную
         }
 
         private void OnTaskSchedulerUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
         {
             HandleException(e.Exception, "TaskScheduler.UnobservedTaskException");
-            e.SetObserved(); // Помечаем исключение как обработанное
+            e.SetObserved();
         }
 
         private void OnAppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             HandleException(e.ExceptionObject as Exception ?? new Exception("Non-CLR exception from AppDomain"), "AppDomain.CurrentDomain.UnhandledException");
-            // Здесь решение о Shutdown() зависит от политики обработки ошибок.
-            // Если это критическая ошибка, возможно, стоит завершить приложение.
-            // Environment.Exit(1); или Shutdown();
+            // Рассмотрите возможность закрытия приложения здесь, если ошибка критическая
+            // Environment.Exit(1); // Жесткое закрытие
+            // Shutdown(); // Более мягкое WPF закрытие
         }
 
         protected override async void OnExit(ExitEventArgs e)
         {
+            Serilog.Log.Information("Application exiting with code {ExitCode}", e.ApplicationExitCode);
             if (AppHost != null)
             {
                 await AppHost.StopAsync();
                 AppHost.Dispose();
             }
-            Serilog.Log.CloseAndFlush(); // Закрытие логгера Serilog
+            Serilog.Log.CloseAndFlush(); // Важно для записи всех логов перед выходом
             base.OnExit(e);
         }
     }

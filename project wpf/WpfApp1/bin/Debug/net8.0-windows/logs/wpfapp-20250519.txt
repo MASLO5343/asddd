@@ -1,0 +1,102 @@
+2025-05-19 04:53:09.706 +03:00 [INF] [1] (Microsoft.Hosting.Lifetime) Application started. Press Ctrl+C to shut down.
+2025-05-19 04:53:09.793 +03:00 [INF] [1] (Microsoft.Hosting.Lifetime) Hosting environment: Production
+2025-05-19 04:53:09.847 +03:00 [INF] [1] (Microsoft.Hosting.Lifetime) Content root path: D:\project wpf\WpfApp1\bin\Debug\net8.0-windows
+2025-05-19 04:53:10.013 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) Starting database seeding process.
+2025-05-19 04:53:11.392 +03:00 [INF] [5] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand (38ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2025-05-19 04:53:11.485 +03:00 [INF] [9] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand (30ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+
+IF EXISTS
+    (SELECT *
+     FROM [sys].[objects] o
+     WHERE [o].[type] = 'U'
+     AND [o].[is_ms_shipped] = 0
+     AND NOT EXISTS (SELECT *
+         FROM [sys].[extended_properties] AS [ep]
+         WHERE [ep].[major_id] = [o].[object_id]
+             AND [ep].[minor_id] = 0
+             AND [ep].[class] = 1
+             AND [ep].[name] = N'microsoft_database_tools_support'
+    )
+)
+SELECT 1 ELSE SELECT 0
+2025-05-19 04:53:11.930 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) Creating Admin role if it doesn't exist.
+2025-05-19 04:53:11.987 +03:00 [INF] [1] (WpfApp1.Services.RoleService) Запрос роли по имени: Admin
+2025-05-19 04:53:12.510 +03:00 [INF] [5] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand (68ms) [Parameters=[@__lowerRoleName_0='?' (Size = 50)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[RoleId], [r].[Description], [r].[RoleName]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[RoleName]) = @__lowerRoleName_0
+2025-05-19 04:53:13.516 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) Admin role already exists with ID: 1.
+2025-05-19 04:53:13.572 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) Creating User role if it doesn't exist.
+2025-05-19 04:53:13.627 +03:00 [INF] [1] (WpfApp1.Services.RoleService) Запрос роли по имени: User
+2025-05-19 04:53:13.687 +03:00 [INF] [5] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand (2ms) [Parameters=[@__lowerRoleName_0='?' (Size = 50)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[RoleId], [r].[Description], [r].[RoleName]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[RoleName]) = @__lowerRoleName_0
+2025-05-19 04:53:13.748 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) User role already exists with ID: 2.
+2025-05-19 04:53:13.802 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) Checking for default Admin user.
+2025-05-19 04:53:13.974 +03:00 [INF] [5] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand (2ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[UserId], [u].[CreatedAt], [u].[Email], [u].[FullName], [u].[IsActive], [u].[PasswordHash], [u].[RoleId], [u].[Username], [r].[RoleId], [r].[Description], [r].[RoleName]
+FROM [Users] AS [u]
+INNER JOIN [Roles] AS [r] ON [u].[RoleId] = [r].[RoleId]
+WHERE LOWER([u].[Username]) = @__ToLower_0
+2025-05-19 04:53:14.098 +03:00 [INF] [1] (WpfApp1.Services.UserService) Пользователь admin успешно найден.
+2025-05-19 04:53:14.152 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) Default Admin user already exists with ID: 6
+2025-05-19 04:53:14.210 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) Database seeding process completed.
+2025-05-19 04:53:14.242 +03:00 [INF] [1] () Logging level set to "Debug" from configuration.
+2025-05-19 04:53:14.308 +03:00 [ERR] [1] (WpfApp1.Services.LoggingService) Домен Active Directory не сконфигурирован в appsettings.json (ActiveDirectory:DomainName). AD аутентификация будет недоступна.
+2025-05-19 04:53:14.364 +03:00 [INF] [1] (WpfApp1.ViewModels.MainViewModel) Экземпляр MainViewModel создан (без инициализации сервисов).
+2025-05-19 04:54:13.403 +03:00 [INF] [1] (WpfApp1.MainWindow) MainWindow is closing.
+2025-05-19 04:54:13.434 +03:00 [INF] [1] () Application exiting with code 0
+2025-05-19 04:54:13.544 +03:00 [INF] [1] (Microsoft.Hosting.Lifetime) Application is shutting down...
+2025-05-19 11:43:45.764 +03:00 [INF] [1] (Microsoft.Hosting.Lifetime) Application started. Press Ctrl+C to shut down.
+2025-05-19 11:43:45.853 +03:00 [INF] [1] (Microsoft.Hosting.Lifetime) Hosting environment: Production
+2025-05-19 11:43:45.974 +03:00 [INF] [1] (Microsoft.Hosting.Lifetime) Content root path: D:\project wpf\WpfApp1\bin\Debug\net8.0-windows
+2025-05-19 11:43:46.047 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) Starting database seeding process.
+2025-05-19 11:43:47.574 +03:00 [INF] [7] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand (14ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2025-05-19 11:43:47.777 +03:00 [INF] [9] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand (119ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+
+IF EXISTS
+    (SELECT *
+     FROM [sys].[objects] o
+     WHERE [o].[type] = 'U'
+     AND [o].[is_ms_shipped] = 0
+     AND NOT EXISTS (SELECT *
+         FROM [sys].[extended_properties] AS [ep]
+         WHERE [ep].[major_id] = [o].[object_id]
+             AND [ep].[minor_id] = 0
+             AND [ep].[class] = 1
+             AND [ep].[name] = N'microsoft_database_tools_support'
+    )
+)
+SELECT 1 ELSE SELECT 0
+2025-05-19 11:43:48.397 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) Creating Admin role if it doesn't exist.
+2025-05-19 11:43:48.465 +03:00 [INF] [1] (WpfApp1.Services.RoleService) Запрос роли по имени: Admin
+2025-05-19 11:43:49.058 +03:00 [INF] [7] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand (86ms) [Parameters=[@__lowerRoleName_0='?' (Size = 50)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[RoleId], [r].[Description], [r].[RoleName]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[RoleName]) = @__lowerRoleName_0
+2025-05-19 11:43:50.814 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) Admin role already exists with ID: 1.
+2025-05-19 11:43:50.879 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) Creating User role if it doesn't exist.
+2025-05-19 11:43:50.955 +03:00 [INF] [1] (WpfApp1.Services.RoleService) Запрос роли по имени: User
+2025-05-19 11:43:51.044 +03:00 [INF] [5] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand (7ms) [Parameters=[@__lowerRoleName_0='?' (Size = 50)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[RoleId], [r].[Description], [r].[RoleName]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[RoleName]) = @__lowerRoleName_0
+2025-05-19 11:43:51.124 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) User role already exists with ID: 2.
+2025-05-19 11:43:51.189 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) Checking for default Admin user.
+2025-05-19 11:43:51.412 +03:00 [INF] [5] (Microsoft.EntityFrameworkCore.Database.Command) Executed DbCommand (2ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[UserId], [u].[CreatedAt], [u].[Email], [u].[FullName], [u].[IsActive], [u].[PasswordHash], [u].[RoleId], [u].[Username], [r].[RoleId], [r].[Description], [r].[RoleName]
+FROM [Users] AS [u]
+INNER JOIN [Roles] AS [r] ON [u].[RoleId] = [r].[RoleId]
+WHERE LOWER([u].[Username]) = @__ToLower_0
+2025-05-19 11:43:51.732 +03:00 [INF] [1] (WpfApp1.Services.UserService) Пользователь admin успешно найден.
+2025-05-19 11:43:51.794 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) Default Admin user already exists with ID: 6
+2025-05-19 11:43:51.854 +03:00 [INF] [1] (WpfApp1.Services.DatabaseSeeder) Database seeding process completed.
+2025-05-19 11:43:51.891 +03:00 [INF] [1] () Logging level set to "Debug" from configuration.
+2025-05-19 11:43:51.971 +03:00 [ERR] [1] (WpfApp1.Services.LoggingService) Домен Active Directory не сконфигурирован в appsettings.json (ActiveDirectory:DomainName). AD аутентификация будет недоступна.
+2025-05-19 11:43:52.043 +03:00 [INF] [1] (WpfApp1.ViewModels.MainViewModel) Экземпляр MainViewModel создан (без инициализации сервисов).
+2025-05-19 11:44:25.479 +03:00 [INF] [1] (WpfApp1.MainWindow) MainWindow is closing.
+2025-05-19 11:44:25.512 +03:00 [INF] [1] () Application exiting with code 0
+2025-05-19 11:44:25.589 +03:00 [INF] [1] (Microsoft.Hosting.Lifetime) Application is shutting down...

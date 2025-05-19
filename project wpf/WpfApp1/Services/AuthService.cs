@@ -1,36 +1,37 @@
 ﻿// WpfApp1/Services/AuthService.cs
-using Microsoft.AspNetCore.Identity; // Для IPasswordHasher<User>
+// using Microsoft.AspNetCore.Identity; // Этот using можно удалить, если IPasswordHasher<User> больше не используется
 using System;
 using System.Security;
 using System.Threading.Tasks;
 using WpfApp1.Enums;
 using WpfApp1.Interfaces;
-using WpfApp1.Models; // Для User
+using WpfApp1.Models;
+using System.Runtime.InteropServices; // Для Marshal
 
 namespace WpfApp1.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly IPasswordHasher<User> _passwordHasher; // Типизирован User
+        // ПОЛЕ _passwordHasher УДАЛЕНО
         private readonly IAdAuthService _adAuthService;
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
-        private readonly ILoggingService _loggingService; // Используем ILoggingService
-        private User? _currentUser; // User может быть null
-        private string? _lastAuthenticationError; // Может быть null
+        private readonly ILoggingService _loggingService; // Ваш сервис-обертка
+        private User? _currentUser;
+        private string? _lastAuthenticationError;
 
         public AuthService(
-            IPasswordHasher<User> passwordHasher, // Типизирован User
+            // ПАРАМЕТР IPasswordHasher<User> passwordHasher УДАЛЕН
             IAdAuthService adAuthService,
             IUserService userService,
             IRoleService roleService,
-            ILoggingService loggingService) // Используем ILoggingService
+            ILoggingService loggingService)
         {
-            _passwordHasher = passwordHasher;
-            _adAuthService = adAuthService;
-            _userService = userService;
-            _roleService = roleService;
-            _loggingService = loggingService;
+            // ПРИСВОЕНИЕ _passwordHasher = passwordHasher УДАЛЕНО
+            _adAuthService = adAuthService ?? throw new ArgumentNullException(nameof(adAuthService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _roleService = roleService ?? throw new ArgumentNullException(nameof(roleService));
+            _loggingService = loggingService ?? throw new ArgumentNullException(nameof(loggingService));
         }
 
         public async Task<User?> AuthenticateAsync(string username, SecureString securePassword, AuthenticationType authType)
@@ -38,10 +39,23 @@ namespace WpfApp1.Services
             _currentUser = null;
             _lastAuthenticationError = null;
 
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                _lastAuthenticationError = "Имя пользователя не может быть пустым.";
+                _loggingService.LogWarning("Попытка аутентификации с пустым именем пользователя."); // 1 аргумент
+                return null;
+            }
+            if (securePassword == null || securePassword.Length == 0)
+            {
+                _lastAuthenticationError = "Пароль не может быть пустым.";
+                _loggingService.LogWarning($"Попытка аутентификации для пользователя '{username}' без пароля."); // Строковая интерполяция $
+                return null;
+            }
+
             if (authType == AuthenticationType.ActiveDirectory)
             {
                 var (isAdAuthenticated, adDetails, adErrorMessage) = await _adAuthService.AuthenticateAsync(username, securePassword);
-                if (isAdAuthenticated && adDetails != null) // Проверка adDetails на null
+                if (isAdAuthenticated && adDetails != null)
                 {
                     var user = await _userService.GetUserByUsernameAsync(username);
                     if (user == null)
@@ -50,7 +64,8 @@ namespace WpfApp1.Services
                         var defaultRole = await _roleService.GetRoleByNameAsync("User");
                         if (defaultRole == null)
                         {
-                            _loggingService.LogError("Роль по умолчанию 'User' не найдена. Невозможно создать локального пользователя для AD.");
+                            // LogError(string message, Exception ex = null)
+                            _loggingService.LogError("Роль по умолчанию 'User' не найдена. Невозможно создать локального пользователя для AD.", null);
                             _lastAuthenticationError = "Ошибка конфигурации: роль по умолчанию для новых AD пользователей не найдена.";
                             return null;
                         }
@@ -58,7 +73,6 @@ namespace WpfApp1.Services
                         var newUser = new User
                         {
                             Username = adDetails.Username,
-                            // PasswordHash = "", // Будет перезаписан CreateUserAsync
                             FullName = adDetails.FullName,
                             Email = adDetails.Email,
                             RoleId = defaultRole.RoleId,
@@ -67,9 +81,8 @@ namespace WpfApp1.Services
                             CreatedAt = DateTime.UtcNow
                         };
 
-                        // Генерируем случайный пароль для CreateUserAsync
-                        var generatedPassword = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N");
-                        var createdUser = await _userService.CreateUserAsync(newUser, generatedPassword);
+                        var generatedPasswordForLocalStore = Guid.NewGuid().ToString("N");
+                        var createdUser = await _userService.CreateUserAsync(newUser, generatedPasswordForLocalStore);
 
                         if (createdUser != null)
                         {
@@ -78,14 +91,21 @@ namespace WpfApp1.Services
                         }
                         else
                         {
-                            _loggingService.LogError($"Не удалось создать локального пользователя для AD '{username}'.");
+                            _loggingService.LogError($"Не удалось создать локального пользователя для AD '{username}'.", null);
                             _lastAuthenticationError = "Не удалось создать локальную учетную запись для пользователя AD.";
                             return null;
                         }
                     }
                     else
                     {
+                        if (!user.IsActive)
+                        {
+                            _loggingService.LogWarning($"Пользователь AD '{username}' найден локально, но неактивен. Отказ в доступе.");
+                            _lastAuthenticationError = "Учетная запись пользователя неактивна.";
+                            return null;
+                        }
                         _loggingService.LogInformation($"Пользователь AD '{username}' найден локально. ID={user.UserId}, RoleId={user.RoleId}.");
+
                         bool changed = false;
                         if (user.FullName != adDetails.FullName && !string.IsNullOrEmpty(adDetails.FullName))
                         {
@@ -99,8 +119,14 @@ namespace WpfApp1.Services
                         }
                         if (changed)
                         {
-                            await _userService.UpdateUserAsync(user); // Предполагается, что UpdateUserAsync корректно обрабатывает обновление
-                            _loggingService.LogInformation($"Данные локального пользователя '{username}' обновлены из AD.");
+                            if (await _userService.UpdateUserAsync(user))
+                            {
+                                _loggingService.LogInformation($"Данные локального пользователя '{username}' обновлены из AD.");
+                            }
+                            else
+                            {
+                                _loggingService.LogWarning($"Не удалось обновить данные локального пользователя '{username}' из AD.");
+                            }
                         }
                         _currentUser = user;
                     }
@@ -117,30 +143,27 @@ namespace WpfApp1.Services
                 if (user != null && user.IsActive)
                 {
                     IntPtr bstr = IntPtr.Zero;
-                    string? plainPassword = null; // string? чтобы можно было присвоить null
+                    string? plainPassword = null;
                     try
                     {
-                        bstr = System.Runtime.InteropServices.Marshal.SecureStringToBSTR(securePassword);
-                        plainPassword = System.Runtime.InteropServices.Marshal.PtrToStringBSTR(bstr);
+                        bstr = Marshal.SecureStringToBSTR(securePassword);
+                        plainPassword = Marshal.PtrToStringBSTR(bstr);
 
-                        // Проверка пароля с использованием IPasswordHasher<User>
-                        var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, plainPassword ?? string.Empty);
-                        if (passwordVerificationResult == PasswordVerificationResult.Success || passwordVerificationResult == PasswordVerificationResult.SuccessRehashNeeded)
+                        // Используем BCrypt.Net.BCrypt.Verify
+                        if (BCrypt.Net.BCrypt.Verify(plainPassword, user.PasswordHash))
                         {
-                            _loggingService.LogInformation($"Локальный пользователь '{username}' успешно аутентифицирован.");
+                            _loggingService.LogInformation($"Локальный пользователь '{username}' успешно аутентифицирован (BCrypt).");
                             _currentUser = user;
                         }
                         else
                         {
-                            _loggingService.LogWarning($"Локальная аутентификация не удалась для пользователя '{username}'. Неверный пароль.");
+                            _loggingService.LogWarning($"Локальная аутентификация не удалась для пользователя '{username}'. Неверный пароль (проверка BCrypt).");
                             _lastAuthenticationError = "Неверное имя пользователя или пароль.";
                         }
                     }
                     finally
                     {
-                        if (bstr != IntPtr.Zero) System.Runtime.InteropServices.Marshal.ZeroFreeBSTR(bstr);
-                        if (plainPassword != null) Array.Clear(plainPassword.ToCharArray(), 0, plainPassword.Length); // Очистка пароля из памяти
-                        plainPassword = null;
+                        if (bstr != IntPtr.Zero) Marshal.ZeroFreeBSTR(bstr);
                     }
                 }
                 else if (user != null && !user.IsActive)
@@ -155,11 +178,26 @@ namespace WpfApp1.Services
                 }
             }
 
-            if (_currentUser != null && _currentUser.Role == null && _currentUser.RoleId > 0)
+            if (_currentUser != null && (_currentUser.Role == null && _currentUser.RoleId > 0))
             {
-                _loggingService.LogError($"КРИТИЧЕСКАЯ ОШИБКА: Роль для пользователя '{_currentUser.Username}' (RoleId: {_currentUser.RoleId}) не была загружена сервисом IUserService.");
-                _lastAuthenticationError = "Критическая ошибка: не удалось загрузить данные о роли пользователя.";
-                // _currentUser = null; // Раскомментируйте, если сессия должна быть прервана
+                var role = await _roleService.GetRoleByIdAsync(_currentUser.RoleId);
+                if (role != null)
+                {
+                    _currentUser.Role = role;
+                    _loggingService.LogInformation($"Роль '{role.RoleName}' была дополнительно загружена для пользователя '{_currentUser.Username}'.");
+                }
+                else
+                {
+                    _loggingService.LogError($"КРИТИЧЕСКАЯ ОШИБКА: Роль для пользователя '{_currentUser.Username}' (RoleId: {_currentUser.RoleId}) не была загружена и не найдена по ID.", null);
+                    _lastAuthenticationError = "Критическая ошибка: не удалось загрузить данные о роли пользователя.";
+                    _currentUser = null;
+                }
+            }
+            else if (_currentUser != null && _currentUser.Role == null && _currentUser.RoleId == 0)
+            {
+                _loggingService.LogError($"КРИТИЧЕСКАЯ ОШИБКА: Пользователь '{_currentUser.Username}' не имеет назначенной роли (RoleId is 0).", null);
+                _lastAuthenticationError = "Критическая ошибка: пользователю не назначена роль.";
+                _currentUser = null;
             }
 
             return _currentUser;
@@ -171,7 +209,7 @@ namespace WpfApp1.Services
 
         public async Task LogoutAsync()
         {
-            var currentUserName = _currentUser?.Username; // Сохраним имя для лога перед сбросом
+            var currentUserName = _currentUser?.Username;
             _currentUser = null;
             _lastAuthenticationError = null;
             _loggingService.LogInformation($"Пользователь '{currentUserName ?? "N/A"}' вышел из системы.");

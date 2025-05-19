@@ -3,8 +3,27 @@
   "WorkspaceRootPath": "D:\\project wpf\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\kiril\\OneDrive\\\u0420\u0430\u0431\u043E\u0447\u0438\u0439 \u0441\u0442\u043E\u043B\\Documents\\GitHub\\asddd\\project wpf\\WpfApp1\\App.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{D79BE0FA-BBD2-4DC0-A8FB-F9F6376F167B}|WpfApp1\\WpfApp1.csproj|d:\\project wpf\\wpfapp1\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{D79BE0FA-BBD2-4DC0-A8FB-F9F6376F167B}|WpfApp1\\WpfApp1.csproj|solutionrelative:wpfapp1\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D79BE0FA-BBD2-4DC0-A8FB-F9F6376F167B}|WpfApp1\\WpfApp1.csproj|d:\\project wpf\\wpfapp1\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D79BE0FA-BBD2-4DC0-A8FB-F9F6376F167B}|WpfApp1\\WpfApp1.csproj|solutionrelative:wpfapp1\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D79BE0FA-BBD2-4DC0-A8FB-F9F6376F167B}|WpfApp1\\WpfApp1.csproj|d:\\project wpf\\wpfapp1\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D79BE0FA-BBD2-4DC0-A8FB-F9F6376F167B}|WpfApp1\\WpfApp1.csproj|solutionrelative:wpfapp1\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D79BE0FA-BBD2-4DC0-A8FB-F9F6376F167B}|WpfApp1\\WpfApp1.csproj|d:\\project wpf\\wpfapp1\\interfaces\\iloggingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D79BE0FA-BBD2-4DC0-A8FB-F9F6376F167B}|WpfApp1\\WpfApp1.csproj|solutionrelative:wpfapp1\\interfaces\\iloggingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D79BE0FA-BBD2-4DC0-A8FB-F9F6376F167B}|WpfApp1\\WpfApp1.csproj|d:\\project wpf\\wpfapp1\\loginwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D79BE0FA-BBD2-4DC0-A8FB-F9F6376F167B}|WpfApp1\\WpfApp1.csproj|solutionrelative:wpfapp1\\loginwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D79BE0FA-BBD2-4DC0-A8FB-F9F6376F167B}|WpfApp1\\WpfApp1.csproj|d:\\project wpf\\wpfapp1\\loginwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
@@ -41,82 +60,34 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "LoginWindow.xaml",
-              "DocumentMoniker": "D:\\project wpf\\WpfApp1\\LoginWindow.xaml",
-              "RelativeDocumentMoniker": "WpfApp1\\LoginWindow.xaml",
-              "ToolTip": "D:\\project wpf\\WpfApp1\\LoginWindow.xaml",
-              "RelativeToolTip": "WpfApp1\\LoginWindow.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-05-18T23:48:38.45Z",
+              "DocumentIndex": 0,
+              "Title": "App.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\kiril\\OneDrive\\\u0420\u0430\u0431\u043E\u0447\u0438\u0439 \u0441\u0442\u043E\u043B\\Documents\\GitHub\\asddd\\project wpf\\WpfApp1\\App.xaml.cs",
+              "ToolTip": "C:\\Users\\kiril\\OneDrive\\\u0420\u0430\u0431\u043E\u0447\u0438\u0439 \u0441\u0442\u043E\u043B\\Documents\\GitHub\\asddd\\project wpf\\WpfApp1\\App.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-19T01:55:16.859Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "coreclr.cpp",
-              "DocumentMoniker": "C:\\Users\\kiril\\AppData\\Local\\SourceServer\\d02e8420a9783d66a9dea3a874e9f506864bd3bb4a32d9e74a7236eb1b6e76a4\\src\\native\\corehost\\hostpolicy\\coreclr.cpp",
-              "ToolTip": "C:\\Users\\kiril\\AppData\\Local\\SourceServer\\d02e8420a9783d66a9dea3a874e9f506864bd3bb4a32d9e74a7236eb1b6e76a4\\src\\native\\corehost\\hostpolicy\\coreclr.cpp [\u0422\u043E\u043B\u044C\u043A\u043E \u0447\u0442\u0435\u043D\u0438\u0435]",
-              "ViewState": "AgIAAFgAAAAAAAAAAAAmwGwAAAAEAAAAAQAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-05-18T23:25:59.176Z",
-              "EditorCaption": " [\u0422\u043E\u043B\u044C\u043A\u043E \u0447\u0442\u0435\u043D\u0438\u0435]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "DashboardViewModel.cs",
-              "DocumentMoniker": "D:\\project wpf\\WpfApp1\\ViewModels\\DashboardViewModel.cs",
-              "RelativeDocumentMoniker": "WpfApp1\\ViewModels\\DashboardViewModel.cs",
-              "ToolTip": "D:\\project wpf\\WpfApp1\\ViewModels\\DashboardViewModel.cs",
-              "RelativeToolTip": "WpfApp1\\ViewModels\\DashboardViewModel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "D:\\project wpf\\WpfApp1\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "WpfApp1\\Services\\AuthService.cs",
+              "ToolTip": "D:\\project wpf\\WpfApp1\\Services\\AuthService.cs",
+              "RelativeToolTip": "WpfApp1\\Services\\AuthService.cs",
+              "ViewState": "AgIAALgAAAAAAAAAAAAmwNoAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-18T20:42:34.221Z"
+              "WhenOpened": "2025-05-19T00:40:45.964Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "MainWindow.xaml.cs",
-              "DocumentMoniker": "D:\\project wpf\\WpfApp1\\MainWindow.xaml.cs",
-              "RelativeDocumentMoniker": "WpfApp1\\MainWindow.xaml.cs",
-              "ToolTip": "D:\\project wpf\\WpfApp1\\MainWindow.xaml.cs",
-              "RelativeToolTip": "WpfApp1\\MainWindow.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAI8AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-18T20:06:52.261Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "AddSoftwareToDeviceDialog.xaml.cs",
-              "DocumentMoniker": "D:\\project wpf\\WpfApp1\\Views\\Dialogs\\AddSoftwareToDeviceDialog.xaml.cs",
-              "RelativeDocumentMoniker": "WpfApp1\\Views\\Dialogs\\AddSoftwareToDeviceDialog.xaml.cs",
-              "ToolTip": "D:\\project wpf\\WpfApp1\\Views\\Dialogs\\AddSoftwareToDeviceDialog.xaml.cs",
-              "RelativeToolTip": "WpfApp1\\Views\\Dialogs\\AddSoftwareToDeviceDialog.xaml.cs",
-              "ViewState": "AgIAAFIAAAAAAAAAAAAqwG8AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-18T20:06:13.78Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "AppDbContext.cs",
-              "DocumentMoniker": "D:\\project wpf\\WpfApp1\\Models\\AppDbContext.cs",
-              "RelativeDocumentMoniker": "WpfApp1\\Models\\AppDbContext.cs",
-              "ToolTip": "D:\\project wpf\\WpfApp1\\Models\\AppDbContext.cs",
-              "RelativeToolTip": "WpfApp1\\Models\\AppDbContext.cs",
-              "ViewState": "AgIAACAAAAAAAAAAAAAQwDYAAAAvAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-18T19:35:38.908Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "App.xaml",
               "DocumentMoniker": "D:\\project wpf\\WpfApp1\\App.xaml",
               "RelativeDocumentMoniker": "WpfApp1\\App.xaml",
@@ -128,7 +99,113 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ILoggingService.cs",
+              "DocumentMoniker": "D:\\project wpf\\WpfApp1\\Interfaces\\ILoggingService.cs",
+              "RelativeDocumentMoniker": "WpfApp1\\Interfaces\\ILoggingService.cs",
+              "ToolTip": "D:\\project wpf\\WpfApp1\\Interfaces\\ILoggingService.cs",
+              "RelativeToolTip": "WpfApp1\\Interfaces\\ILoggingService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-19T00:49:58.486Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 3,
+              "Title": "App.xaml.cs",
+              "DocumentMoniker": "D:\\project wpf\\WpfApp1\\App.xaml.cs",
+              "RelativeDocumentMoniker": "WpfApp1\\App.xaml.cs",
+              "ToolTip": "D:\\project wpf\\WpfApp1\\App.xaml.cs",
+              "RelativeToolTip": "WpfApp1\\App.xaml.cs",
+              "ViewState": "AgIAAOIAAAAAAAAAAAAqwPwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-19T00:33:04.365Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "LoginWindow.xaml.cs",
+              "DocumentMoniker": "D:\\project wpf\\WpfApp1\\LoginWindow.xaml.cs",
+              "RelativeDocumentMoniker": "WpfApp1\\LoginWindow.xaml.cs",
+              "ToolTip": "D:\\project wpf\\WpfApp1\\LoginWindow.xaml.cs",
+              "RelativeToolTip": "WpfApp1\\LoginWindow.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-18T23:45:45.595Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "LoginWindow.xaml",
+              "DocumentMoniker": "D:\\project wpf\\WpfApp1\\LoginWindow.xaml",
+              "RelativeDocumentMoniker": "WpfApp1\\LoginWindow.xaml",
+              "ToolTip": "D:\\project wpf\\WpfApp1\\LoginWindow.xaml",
+              "RelativeToolTip": "WpfApp1\\LoginWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-05-18T23:48:38.45Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "coreclr.cpp",
+              "DocumentMoniker": "C:\\Users\\kiril\\AppData\\Local\\SourceServer\\d02e8420a9783d66a9dea3a874e9f506864bd3bb4a32d9e74a7236eb1b6e76a4\\src\\native\\corehost\\hostpolicy\\coreclr.cpp",
+              "ToolTip": "C:\\Users\\kiril\\AppData\\Local\\SourceServer\\d02e8420a9783d66a9dea3a874e9f506864bd3bb4a32d9e74a7236eb1b6e76a4\\src\\native\\corehost\\hostpolicy\\coreclr.cpp [\u0422\u043E\u043B\u044C\u043A\u043E \u0447\u0442\u0435\u043D\u0438\u0435]",
+              "ViewState": "AgIAAFgAAAAAAAAAAAAmwGwAAAAEAAAAAQAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-05-18T23:25:59.176Z",
+              "EditorCaption": " [\u0422\u043E\u043B\u044C\u043A\u043E \u0447\u0442\u0435\u043D\u0438\u0435]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "DashboardViewModel.cs",
+              "DocumentMoniker": "D:\\project wpf\\WpfApp1\\ViewModels\\DashboardViewModel.cs",
+              "RelativeDocumentMoniker": "WpfApp1\\ViewModels\\DashboardViewModel.cs",
+              "ToolTip": "D:\\project wpf\\WpfApp1\\ViewModels\\DashboardViewModel.cs",
+              "RelativeToolTip": "WpfApp1\\ViewModels\\DashboardViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-18T20:42:34.221Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "D:\\project wpf\\WpfApp1\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "WpfApp1\\MainWindow.xaml.cs",
+              "ToolTip": "D:\\project wpf\\WpfApp1\\MainWindow.xaml.cs",
+              "RelativeToolTip": "WpfApp1\\MainWindow.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAI8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-18T20:06:52.261Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "AddSoftwareToDeviceDialog.xaml.cs",
+              "DocumentMoniker": "D:\\project wpf\\WpfApp1\\Views\\Dialogs\\AddSoftwareToDeviceDialog.xaml.cs",
+              "RelativeDocumentMoniker": "WpfApp1\\Views\\Dialogs\\AddSoftwareToDeviceDialog.xaml.cs",
+              "ToolTip": "D:\\project wpf\\WpfApp1\\Views\\Dialogs\\AddSoftwareToDeviceDialog.xaml.cs",
+              "RelativeToolTip": "WpfApp1\\Views\\Dialogs\\AddSoftwareToDeviceDialog.xaml.cs",
+              "ViewState": "AgIAAFIAAAAAAAAAAAAqwG8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-18T20:06:13.78Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "D:\\project wpf\\WpfApp1\\Models\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "WpfApp1\\Models\\AppDbContext.cs",
+              "ToolTip": "D:\\project wpf\\WpfApp1\\Models\\AppDbContext.cs",
+              "RelativeToolTip": "WpfApp1\\Models\\AppDbContext.cs",
+              "ViewState": "AgIAACAAAAAAAAAAAAAQwDYAAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-18T19:35:38.908Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
               "Title": "appsettings.json",
               "DocumentMoniker": "D:\\project wpf\\WpfApp1\\appsettings.json",
               "RelativeDocumentMoniker": "WpfApp1\\appsettings.json",
