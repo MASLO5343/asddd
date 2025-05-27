@@ -68,11 +68,6 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <TextBlock HorizontalAlignment="Center" Margin="0,10,0,0">
-                    <Hyperlink Command="{Binding ShowRegistrationCommand}" Foreground="#FFBBBBBB">
-                        <Run Text="Зарегистрироваться"/>
-                    </Hyperlink>
-                </TextBlock>
             </StackPanel>
         </Border>
     </Grid>

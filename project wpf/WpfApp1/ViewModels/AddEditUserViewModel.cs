@@ -1,5 +1,4 @@
-﻿// WpfApp1/ViewModels/AddEditUserViewModel.cs
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
@@ -10,8 +9,10 @@ using System.Threading.Tasks;
 using WpfApp1.Interfaces;
 using WpfApp1.Messages;
 using WpfApp1.Models;
-// DialogCloseRequestedEventArgs is likely no longer needed here if CloseRequested event changes signature
-// using WpfApp1.Services; // If DialogCloseRequestedEventArgs was there
+using System.Security; // Добавлено для SecureString
+using System.Windows.Controls; // Добавлено для PasswordBox
+using System.Runtime.InteropServices; // Добавлено для Marshal (для работы с SecureString)
+
 
 namespace WpfApp1.ViewModels
 {
@@ -37,11 +38,11 @@ namespace WpfApp1.ViewModels
         [ObservableProperty]
         private string _lastName = string.Empty;
 
-        [ObservableProperty]
-        private string? _password;
-
-        [ObservableProperty]
-        private string? _confirmPassword;
+        // УДАЛЯЕМ ObservableProperty для Password и ConfirmPassword, так как они теперь получаются из PasswordBox
+        // [ObservableProperty]
+        // private string? _password;
+        // [ObservableProperty]
+        // private string? _confirmPassword;
 
         [ObservableProperty]
         private Role? _selectedRole;
@@ -82,6 +83,13 @@ namespace WpfApp1.ViewModels
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _messenger = messenger;
+
+            // SaveCommand и CancelCommand генерируются автоматически RelayCommand.
+            // НЕ НУЖНО ИНИЦИАЛИЗИРОВАТЬ ИХ ЗДЕСЬ ВРУЧНУЮ
+            // SaveCommand = new AsyncRelayCommand<object[]>(ExecuteSaveUserAsync, CanExecuteSaveUser);
+            // CancelCommand = new RelayCommand(Cancel);
+
+            _messenger.RegisterAll(this);
         }
 
         public AddEditUserViewModel()
@@ -152,14 +160,13 @@ namespace WpfApp1.ViewModels
                 }
 
                 IsActive = user.IsActive;
-                Password = null;
-                ConfirmPassword = null;
+                // Пароль и подтверждение пароля не устанавливаются при инициализации
+                // Password = null;
+                // ConfirmPassword = null;
 
-                // Corrected lines for CS1061: user.RoleId is int, not int?
-                // No .HasValue or .Value needed. Assuming RoleId > 0 means a role is assigned.
-                if (Roles.Any() && user.RoleId > 0) // Line 158 (approx.)
+                if (Roles.Any() && user.RoleId > 0)
                 {
-                    SelectedRole = Roles.FirstOrDefault(r => r.RoleId == user.RoleId); // Line 160 (approx.)
+                    SelectedRole = Roles.FirstOrDefault(r => r.RoleId == user.RoleId);
                 }
                 else if (!Roles.Any())
                 {
@@ -174,19 +181,27 @@ namespace WpfApp1.ViewModels
                 Username = string.Empty;
                 FirstName = string.Empty;
                 LastName = string.Empty;
-                Password = string.Empty;
-                ConfirmPassword = string.Empty;
+                // Пароль и подтверждение пароля не устанавливаются здесь, они будут получены из PasswordBox
+                // Password = string.Empty;
+                // ConfirmPassword = string.Empty;
                 IsActive = true;
                 SelectedRole = Roles.FirstOrDefault();
                 _logger.LogInformation("Initialized ViewModel for adding a new user.");
             }
         }
 
-        [RelayCommand]
-        private async Task SaveUserAsync()
+        // Изменено: AsyncRelayCommand теперь принимает object[]
+        // Атрибут RelayCommand сгенерирует свойство SaveCommand
+        [RelayCommand(CanExecute = nameof(CanExecuteSaveUser))]
+        private async Task ExecuteSaveUserAsync(object[] parameters)
         {
             _logger.LogInformation("Attempting to save user: {Username}", Username);
-            if (!await ValidateUserInputAsync())
+
+            PasswordBox? userPasswordBox = parameters[0] as PasswordBox;
+            PasswordBox? confirmPasswordBox = parameters[1] as PasswordBox;
+
+            // Передаем PasswordBox для валидации
+            if (!await ValidateUserInputAsync(userPasswordBox, confirmPasswordBox))
             {
                 _logger.LogWarning("User input validation failed for user: {Username}", Username);
                 return;
@@ -215,89 +230,110 @@ namespace WpfApp1.ViewModels
                 bool overallSuccess = false;
                 string? operationError = null;
 
-                if (isNewUser)
+                // Получение пароля из SecureString
+                string? newPlainPassword = null;
+                SecureString? securePassword = null;
+                if (userPasswordBox != null && userPasswordBox.SecurePassword.Length > 0)
                 {
-                    _logger.LogInformation("Creating new user: {Username}", Username);
-                    User? createdUser = await _userService.CreateUserAsync(userToSave, Password!);
-                    if (createdUser != null)
-                    {
-                        userToSave = createdUser;
-                        overallSuccess = true;
-                        _logger.LogInformation("User {Username} created successfully with ID {UserId}.", userToSave.Username, userToSave.UserId);
-                    }
-                    else
-                    {
-                        operationError = "Failed to create the new user.";
-                        _logger.LogError("User creation failed for {Username}.", Username);
-                    }
+                    securePassword = userPasswordBox.SecurePassword.Copy();
+                    newPlainPassword = ConvertToUnsecureString(securePassword);
                 }
-                else
-                {
-                    _logger.LogInformation("Updating existing user: {Username} (ID: {UserId})", userToSave.Username, userToSave.UserId);
-                    bool detailsUpdated = await _userService.UpdateUserAsync(userToSave);
-                    if (detailsUpdated)
-                    {
-                        overallSuccess = true;
-                        _logger.LogInformation("User details for {Username} updated successfully.", userToSave.Username);
 
-                        if (!string.IsNullOrWhiteSpace(Password))
+                try
+                {
+                    if (isNewUser)
+                    {
+                        _logger.LogInformation("Creating new user: {Username}", Username);
+                        // Убедитесь, что newPlainPassword не null для нового пользователя
+                        User? createdUser = await _userService.CreateUserAsync(userToSave, newPlainPassword!);
+                        if (createdUser != null)
                         {
-                            _logger.LogInformation("Attempting to change password for user: {Username}", userToSave.Username);
-                            bool passwordChanged = await _userService.ChangePasswordAsync(userToSave.UserId, Password!);
-                            if (passwordChanged)
-                            {
-                                _logger.LogInformation("Password for user {Username} changed successfully.", userToSave.Username);
-                            }
-                            else
-                            {
-                                overallSuccess = false;
-                                operationError = "User details updated, but failed to change the password.";
-                                _logger.LogError("Password change failed for user: {Username}", userToSave.Username);
-                            }
+                            userToSave = createdUser;
+                            overallSuccess = true;
+                            _logger.LogInformation("User {Username} created successfully with ID {UserId}.", userToSave.Username, userToSave.UserId);
+                        }
+                        else
+                        {
+                            operationError = "Failed to create the new user.";
+                            _logger.LogError("User creation failed for {Username}.", Username);
                         }
                     }
                     else
                     {
-                        operationError = "Failed to update user details.";
-                        _logger.LogError("User details update failed for {Username}.", userToSave.Username);
+                        _logger.LogInformation("Updating existing user: {Username} (ID: {UserId})", userToSave.Username, userToSave.UserId);
+                        bool detailsUpdated = await _userService.UpdateUserAsync(userToSave);
+                        if (detailsUpdated)
+                        {
+                            overallSuccess = true;
+                            _logger.LogInformation("User details for {Username} updated successfully.", userToSave.Username);
+
+                            if (!string.IsNullOrWhiteSpace(newPlainPassword)) // Если пароль был введен
+                            {
+                                _logger.LogInformation("Attempting to change password for user: {Username}", userToSave.Username);
+                                bool passwordChanged = await _userService.ChangePasswordAsync(userToSave.UserId, newPlainPassword);
+                                if (passwordChanged)
+                                {
+                                    _logger.LogInformation("Password for user {Username} changed successfully.", userToSave.Username);
+                                }
+                                else
+                                {
+                                    overallSuccess = false;
+                                    operationError = "User details updated, but failed to change the password.";
+                                    _logger.LogError("Password change failed for user: {Username}", userToSave.Username);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            operationError = "Failed to update user details.";
+                            _logger.LogError("User details update failed for {Username}.", userToSave.Username);
+                        }
                     }
-                }
 
-                if (overallSuccess)
-                {
-                    _logger.LogInformation("User {Username} operation completed successfully.", Username);
-                    SavedUser = userToSave;
-                    _dialogService.ShowMessage("Success", $"User '{Username}' has been saved successfully.");
-
-                    if (isNewUser)
+                    if (overallSuccess)
                     {
-                        _messenger?.Send(new UserAddedMessage(userToSave));
+                        _logger.LogInformation("User {Username} operation completed successfully.", Username);
+                        SavedUser = userToSave;
+                        _dialogService.ShowMessage("Success", $"User '{Username}' has been saved successfully.");
+
+                        if (isNewUser)
+                        {
+                            _messenger?.Send(new UserAddedMessage(userToSave));
+                        }
+                        else
+                        {
+                            _messenger?.Send(new UserUpdatedMessage(userToSave));
+                        }
+                        RequestClose(true);
                     }
                     else
                     {
-                        _messenger?.Send(new UserUpdatedMessage(userToSave));
+                        string fullErrorMessage = $"Could not save user '{Username}'.";
+                        if (!string.IsNullOrEmpty(operationError))
+                        {
+                            fullErrorMessage += $" Reason: {operationError}";
+                        }
+                        else
+                        {
+                            fullErrorMessage += " An unknown error occurred.";
+                        }
+                        _logger.LogError("Failed to save user {Username}. Error: {Error}", Username, operationError ?? "Unknown error.");
+                        _dialogService.ShowError("Save Failed", fullErrorMessage, "");
                     }
-                    RequestClose(true); // Use the new method from IDialogViewModel
                 }
-                else
+                catch (Exception ex)
                 {
-                    string fullErrorMessage = $"Could not save user '{Username}'.";
-                    if (!string.IsNullOrEmpty(operationError))
-                    {
-                        fullErrorMessage += $" Reason: {operationError}";
-                    }
-                    else
-                    {
-                        fullErrorMessage += " An unknown error occurred.";
-                    }
-                    _logger.LogError("Failed to save user {Username}. Error: {Error}", Username, operationError ?? "Unknown error.");
-                    _dialogService.ShowError("Save Failed", fullErrorMessage, "");
+                    _logger.LogError(ex, "An exception occurred while saving user {Username}.", Username);
+                    _dialogService.ShowError("Error", $"An unexpected error occurred while saving the user: {ex.Message}", ex.ToString());
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An exception occurred while saving user {Username}.", Username);
-                _dialogService.ShowError("Error", $"An unexpected error occurred while saving the user: {ex.Message}", ex.ToString());
+                finally
+                {
+                    // Очистка паролей из памяти
+                    if (userPasswordBox != null) userPasswordBox.Clear();
+                    if (confirmPasswordBox != null) confirmPasswordBox.Clear();
+                    securePassword?.Dispose();
+                    // Важно: newPlainPassword = null; // Он будет в стеке, сборщик мусора очистит
+                }
             }
             finally
             {
@@ -305,15 +341,71 @@ namespace WpfApp1.ViewModels
             }
         }
 
+        // Атрибут RelayCommand сгенерирует свойство CancelCommand
         [RelayCommand]
         private void Cancel()
         {
             _logger.LogInformation("User edit/add cancelled for user: {Username}.", Username);
             SavedUser = null;
-            RequestClose(false); // Use the new method from IDialogViewModel
+            RequestClose(false);
         }
 
-        private async Task<bool> ValidateUserInputAsync()
+        // CanExecuteSaveUser теперь принимает параметры для проверки полей PasswordBox
+        private bool CanExecuteSaveUser(object[]? parameters)
+        {
+            // Проверка базовых полей, которые не зависят от PasswordBox
+            bool isValidBase = !string.IsNullOrWhiteSpace(Username) &&
+                               !string.IsNullOrWhiteSpace(FirstName) &&
+                               !string.IsNullOrWhiteSpace(LastName) &&
+                               SelectedRole != null;
+
+            if (!isValidBase) return false;
+
+            // Проверка параметров PasswordBox
+            PasswordBox? userPasswordBox = parameters?[0] as PasswordBox;
+            PasswordBox? confirmPasswordBox = parameters?[1] as PasswordBox;
+
+            bool isNewUser = !IsEditing || _editingUser == null;
+
+            // Для нового пользователя или если пароли вводятся (даже при редактировании)
+            if (isNewUser || (userPasswordBox != null && userPasswordBox.SecurePassword.Length > 0))
+            {
+                // Проверяем, что PasswordBox не null и не пустые
+                if (userPasswordBox == null || confirmPasswordBox == null ||
+                    userPasswordBox.SecurePassword.Length == 0 || confirmPasswordBox.SecurePassword.Length == 0)
+                {
+                    return false; // Пароль обязателен для нового пользователя или если он изменяется
+                }
+
+                // Преобразуем SecureString для сравнения (временное, должно быть очищено)
+                string? plainPassword = ConvertToUnsecureString(userPasswordBox.SecurePassword);
+                string? plainConfirmPassword = ConvertToUnsecureString(confirmPasswordBox.SecurePassword);
+
+                try
+                {
+                    if (plainPassword != plainConfirmPassword)
+                    {
+                        return false; // Пароли не совпадают
+                    }
+                    if (plainPassword.Length < 6) // Пример минимальной длины пароля
+                    {
+                        return false; // Пароль слишком короткий
+                    }
+                }
+                finally
+                {
+                    // Очистка временных строковых представлений паролей
+                    plainPassword = null;
+                    plainConfirmPassword = null;
+                }
+            }
+
+            return !IsBusy; // Добавляем проверку IsBusy для команды
+        }
+
+
+        // Изменено: ValidateUserInputAsync теперь принимает параметры PasswordBox
+        private async Task<bool> ValidateUserInputAsync(PasswordBox? userPasswordBox, PasswordBox? confirmPasswordBox)
         {
             if (string.IsNullOrWhiteSpace(Username))
             {
@@ -344,28 +436,51 @@ namespace WpfApp1.ViewModels
 
             bool isNewUser = !IsEditing || _editingUser == null;
 
-            if (isNewUser)
+            // Получение паролей из PasswordBox для валидации
+            string? password = null;
+            string? confirmPassword = null;
+
+            if (userPasswordBox != null)
             {
-                if (string.IsNullOrWhiteSpace(Password))
-                {
-                    _dialogService.ShowMessage("Validation Error", "Password cannot be empty for a new user.");
-                    return false;
-                }
+                password = ConvertToUnsecureString(userPasswordBox.SecurePassword);
+            }
+            if (confirmPasswordBox != null)
+            {
+                confirmPassword = ConvertToUnsecureString(confirmPasswordBox.SecurePassword);
             }
 
-            if (!string.IsNullOrWhiteSpace(Password))
+            try
             {
-                if (Password != ConfirmPassword)
+                if (isNewUser)
                 {
-                    _dialogService.ShowMessage("Validation Error", "Passwords do not match.");
-                    return false;
+                    if (string.IsNullOrWhiteSpace(password))
+                    {
+                        _dialogService.ShowMessage("Validation Error", "Password cannot be empty for a new user.");
+                        return false;
+                    }
                 }
-                if (Password.Length < 6)
+
+                if (!string.IsNullOrWhiteSpace(password))
                 {
-                    _dialogService.ShowMessage("Validation Error", "Password must be at least 6 characters long.");
-                    return false;
+                    if (password != confirmPassword)
+                    {
+                        _dialogService.ShowMessage("Validation Error", "Passwords do not match.");
+                        return false;
+                    }
+                    if (password.Length < 6)
+                    {
+                        _dialogService.ShowMessage("Validation Error", "Password must be at least 6 characters long.");
+                        return false;
+                    }
                 }
             }
+            finally
+            {
+                // Очистка временных строковых представлений паролей
+                password = null;
+                confirmPassword = null;
+            }
+
 
             if (SelectedRole == null)
             {
@@ -375,6 +490,27 @@ namespace WpfApp1.ViewModels
 
             _logger.LogInformation("User input validation successful for {Username}.", Username);
             return true;
+        }
+
+        // Вспомогательный метод для конвертации SecureString в обычную строку
+        // Использовать осторожно, так как это создает небезопасную строку
+        private string? ConvertToUnsecureString(SecureString securePassword)
+        {
+            if (securePassword == null)
+            {
+                return null;
+            }
+
+            IntPtr unmanagedString = IntPtr.Zero;
+            try
+            {
+                unmanagedString = Marshal.SecureStringToGlobalAllocUnicode(securePassword);
+                return Marshal.PtrToStringUni(unmanagedString);
+            }
+            finally
+            {
+                Marshal.ZeroFreeGlobalAllocUnicode(unmanagedString);
+            }
         }
     }
 }
